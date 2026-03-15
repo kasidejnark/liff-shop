@@ -505,6 +505,8 @@
 
                 console.log("LINE user:", profile.userId);
                 console.log("botnoi id:", botnoiId);
+
+                sendUserToN8N(profile, botnoiId);
                 localStorage.setItem("lineUserId", profile.userId);
 
             } catch (err) {
