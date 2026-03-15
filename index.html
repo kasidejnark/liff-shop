@@ -500,8 +500,11 @@
         <span>${profile.displayName}</span>
         `;
 
-                console.log("UserID:", profile.userId);
 
+                const botnoiId = new URLSearchParams(window.location.search).get("botnoi");
+
+                console.log("LINE user:", profile.userId);
+                console.log("botnoi id:", botnoiId);
                 localStorage.setItem("lineUserId", profile.userId);
 
             } catch (err) {
@@ -511,6 +514,36 @@
             }
 
         }
+
+
+        async function sendUserToN8N(profile, botnoiId) {
+
+            try {
+                const response = await fetch("https://n8n.scgjwd.com/webhook/line-user", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        lineId: profile.userId,
+                        botnoiId: botnoiId,
+                        displayName: profile.displayName,
+                        pictureUrl: profile.pictureUrl
+                    })
+                });
+
+                const result = await response.json();
+
+                console.log("Send to n8n:", result);
+
+            } catch (error) {
+
+                console.error("Error sending to n8n:", error);
+
+            }
+
+        }
+
         // Product Data
         const products = [
             { id: 1, name: 'หูฟังไร้สาย Pro', price: 2990, category: 'electronics', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop' },
