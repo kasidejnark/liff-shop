@@ -43,6 +43,16 @@
             align-items: center;
         }
 
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #userProfile {
+            text-align: center;
+        }
+
         .logo {
             font-size: 1.5rem;
             font-weight: bold;
@@ -427,6 +437,21 @@
                 <span class="cart-count" id="cartCount">0</span>
             </button>
             <div id="userProfile" style="text-align:center;padding:10px;"></div>
+        </div>
+
+        <div class="header-content">
+            <div class="logo">
+                🛍️ ร้านค้าออนไลน์
+            </div>
+
+            <div class="header-right">
+                <button class="cart-btn" onclick="toggleCart()">
+                    🛒 ตะกร้า
+                    <span class="cart-count" id="cartCount">0</span>
+                </button>
+
+                <div id="userProfile"></div>
+            </div>
         </div>
     </header>
 
