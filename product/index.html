@@ -113,9 +113,10 @@
                 }
 
                 const profile = await liff.getProfile();
-                // const params = new URLSearchParams(window.location.search);
-                // const product_code = params.get("product_code");
-                // const botnoiId = params.get("botnoi");
+                const params = new URLSearchParams(window.location.search);
+                const product_code = params.get("product_code");
+                const botnoiId = params.get("botnoi");
+
                 // const params = new URLSearchParams(window.location.search);
                 // const botnoiId = params.get("botnoi");
                 // const product_code = params.get("product_code");
@@ -124,9 +125,9 @@
                 // console.log("botnoi id:", botnoiId);
                 // console.log("product code:", product_code);
 
-                // localStorage.setItem("lineUserId", profile.userId);
-                // localStorage.setItem("botnoiUserId", botnoiId);
-                // localStorage.setItem("productCode", product_code);
+                localStorage.setItem("lineUserId", profile.userId);
+                localStorage.setItem("botnoiUserId", botnoiId);
+                localStorage.setItem("productCode", product_code);
             } catch (err) {
                 console.error("LIFF init error:", err);
             }
