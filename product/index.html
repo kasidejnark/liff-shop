@@ -119,6 +119,10 @@
         <span>${profile.displayName}</span>
         `;
 
+
+                const params = new URLSearchParams(window.location.search);
+                const product_code = params.get("product_code");
+                const botnoiId = params.get("botnoi");
                 // const params = new URLSearchParams(window.location.search);
                 // const botnoiId = params.get("botnoi");
                 // const product_code = params.get("product_code");
@@ -128,16 +132,16 @@
                 // console.log("product code:", product_code);
 
                 localStorage.setItem("lineUserId", profile.userId);
-                // localStorage.setItem("botnoiUserId", botnoiId);
-                // localStorage.setItem("productCode", product_code);
+                localStorage.setItem("botnoiUserId", botnoiId);
+                localStorage.setItem("productCode", product_code);
             } catch (err) {
                 console.error("LIFF init error:", err);
             }
         }
 
         async function getProductData() {
-            const product_code = new URLSearchParams(window.location.search).get("product_code");
-
+            // const product_code = new URLSearchParams(window.location.search).get("product_code");
+            const product_code = localStorage.getItem("productCode");
             try {
                 const response = await fetch(`https://n8n.scgjwd.com/webhook/product-data?product_code=${product_code}`, {
                     method: "GET",
