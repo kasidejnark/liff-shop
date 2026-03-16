@@ -731,12 +731,11 @@
         }
 
         // Initialize
-        document.addEventListener("DOMContentLoaded", () => {
-            product_data();
+        document.addEventListener("DOMContentLoaded", async () => {
+            await initLiff();
+            await product_data();
             renderProducts();
             updateCartUI();
-
-            initLiff();
 
         });
     </script>
