@@ -113,13 +113,6 @@
                 }
 
                 const profile = await liff.getProfile();
-
-                document.getElementById("userProfile").innerHTML = `
-        <img src="${profile.pictureUrl}" width="40" style="border-radius:50%">
-        <span>${profile.displayName}</span>
-        `;
-
-
                 // const params = new URLSearchParams(window.location.search);
                 // const product_code = params.get("product_code");
                 // const botnoiId = params.get("botnoi");
