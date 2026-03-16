@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mini Shop</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f6fa;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        img {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            margin-bottom: 15px;
+        }
+
+        .product-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 80px;
+            padding: 8px;
+            font-size: 16px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #06c755;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #05a94a;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="card">
+
+            <h2>สินค้า</h2>
+
+            <img src="{{ $json.image }}">
+
+            <div class="product-name">
+                {{ $json.product_name }}
+            </div>
+
+            <input id="qty" type="number" value="1" min="1">
+
+            <button onclick="send()">เพิ่มลงตะกร้า</button>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        function send() {
+
+            const qty = document.getElementById('qty').value;
+
+            fetch('/webhook/50fb92c4-7186-48dd-a286-045ee6c40314', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    product: "{{ $json.product_code }}",
+                    qty: qty,
+                    user_id: "{{ $('Code in JavaScript').item.json.user_id }}"
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    alert("เพิ่มสินค้าเรียบร้อย");
+                })
+
+        }
+
+    </script>
+
+</body>
+
+</html>
