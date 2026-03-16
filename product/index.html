@@ -121,12 +121,15 @@
 
                 const params = new URLSearchParams(window.location.search);
                 const botnoiId = params.get("botnoi");
+                const product_code = params.get("product_code");
 
                 console.log("LINE user:", profile.userId);
                 console.log("botnoi id:", botnoiId);
+                console.log("product code:", product_code);
 
                 localStorage.setItem("lineUserId", profile.userId);
                 localStorage.setItem("botnoiUserId", botnoiId);
+                localStorage.setItem("productCode", product_code);
             } catch (err) {
                 console.error("LIFF init error:", err);
             }
@@ -154,16 +157,19 @@
 
 
         function send() {
+            const productCode = localStorage.getItem("productCode");
+            const botnoiUserId = localStorage.getItem("botnoiUserId");
+
 
             const qty = document.getElementById('qty').value;
 
-            fetch('/webhook/50fb92c4-7186-48dd-a286-045ee6c40314', {
+            fetch('https://n8n.scgjwd.com/webhook/50fb92c4-7186-48dd-a286-045ee6c40314', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    product: "{{ $json.product_code }}",
+                    product: productCode,
                     qty: qty,
-                    user_id: "{{ $('Code in JavaScript').item.json.user_id }}"
+                    user_id: botnoiUserId
                 })
             })
                 .then(res => res.json())
