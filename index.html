@@ -546,6 +546,8 @@
 
         }
 
+        let products = []; // global
+        let categoryLabels = {}; // global
         async function product_data(params) {
             try {
                 const response = await fetch("https://n8n.scgjwd.com/webhook/product-data", {
@@ -555,8 +557,8 @@
                     },
                 });
 
-                const products = await response.json();
-                const categoryLabels = {};
+                products = await response.json();
+                categoryLabels = {};
 
                 products.forEach(item => {
                     if (!categoryLabels[item.group]) {
