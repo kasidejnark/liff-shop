@@ -555,44 +555,38 @@
                     },
                 });
 
-                const result = await response.json();
-
-                console.log("Get product data from n8n:", result);
-
+                const products = await response.json();
+                console.log("Get product data from n8n:", products);
             } catch (error) {
-
                 console.error("Error fetching product data from n8n:", error);
-
             }
         }
 
         // Product Data
-        const products = [
-            { id: 1, name: 'หูฟังไร้สาย Pro', price: 2990, category: 'electronics', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop' },
-            { id: 2, name: 'สมาร์ทวอทช์ X1', price: 4590, category: 'electronics', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=300&fit=crop' },
-            { id: 3, name: 'เสื้อยืดคอกลม', price: 350, category: 'clothing', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=300&fit=crop' },
-            { id: 4, name: 'กางเกงยีนส์สลิมฟิต', price: 890, category: 'clothing', image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&h=300&fit=crop' },
-            { id: 5, name: 'สร้อยคอทองคำ', price: 15900, category: 'accessories', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=300&fit=crop' },
-            { id: 6, name: 'กระเป๋าหนังแท้', price: 2490, category: 'accessories', image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&h=300&fit=crop' },
-            { id: 7, name: 'โคมไฟตั้งโต๊ะ LED', price: 790, category: 'home', image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400&h=300&fit=crop' },
-            { id: 8, name: 'หมอนขนห่านเทียม', price: 590, category: 'home', image: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=400&h=300&fit=crop' },
-            { id: 9, name: 'ลำโพงบลูทูธ', price: 1290, category: 'electronics', image: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400&h=300&fit=crop' },
-            { id: 10, name: 'แว่นตากันแดด', price: 1590, category: 'accessories', image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=300&fit=crop' },
-            { id: 11, name: 'เสื้อฮู้ด Oversized', price: 690, category: 'clothing', image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=300&fit=crop' },
-            { id: 12, name: 'แจกันเซรามิก', price: 450, category: 'home', image: 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=400&h=300&fit=crop' },
-        ];
+        // const products = [
+        //     { id: 1, name: 'หูฟังไร้สาย Pro', price: 2990, category: 'electronics', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop' },
+        //     { id: 2, name: 'สมาร์ทวอทช์ X1', price: 4590, category: 'electronics', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=300&fit=crop' },
+        //     { id: 3, name: 'เสื้อยืดคอกลม', price: 350, category: 'clothing', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=300&fit=crop' },
+        //     { id: 4, name: 'กางเกงยีนส์สลิมฟิต', price: 890, category: 'clothing', image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&h=300&fit=crop' },
+        //     { id: 5, name: 'สร้อยคอทองคำ', price: 15900, category: 'accessories', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=300&fit=crop' },
+        //     { id: 6, name: 'กระเป๋าหนังแท้', price: 2490, category: 'accessories', image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&h=300&fit=crop' },
+        //     { id: 7, name: 'โคมไฟตั้งโต๊ะ LED', price: 790, category: 'home', image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400&h=300&fit=crop' },
+        //     { id: 8, name: 'หมอนขนห่านเทียม', price: 590, category: 'home', image: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=400&h=300&fit=crop' },
+        //     { id: 9, name: 'ลำโพงบลูทูธ', price: 1290, category: 'electronics', image: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400&h=300&fit=crop' },
+        //     { id: 10, name: 'แว่นตากันแดด', price: 1590, category: 'accessories', image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=300&fit=crop' },
+        //     { id: 11, name: 'เสื้อฮู้ด Oversized', price: 690, category: 'clothing', image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=300&fit=crop' },
+        //     { id: 12, name: 'แจกันเซรามิก', price: 450, category: 'home', image: 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=400&h=300&fit=crop' },
+        // ];
 
         // Cart State
         let cart = [];
         let currentFilter = 'all';
 
         // Category Labels
-        const categoryLabels = {
-            electronics: 'อิเล็กทรอนิกส์',
-            clothing: 'เสื้อผ้า',
-            accessories: 'เครื่องประดับ',
-            home: 'ของใช้ในบ้าน'
-        };
+        const categoryLabels = {};
+        data.forEach(item => {
+            categoryLabels[item.group] = item.group;
+        });
 
         // Render Products
         function renderProducts() {
