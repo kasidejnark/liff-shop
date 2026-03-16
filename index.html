@@ -556,6 +556,13 @@
                 });
 
                 const products = await response.json();
+                const categoryLabels = {};
+
+                products.forEach(item => {
+                    if (!categoryLabels[item.group]) {
+                        categoryLabels[item.group] = item.group;
+                    }
+                });
                 console.log("Get product data from n8n:", products);
             } catch (error) {
                 console.error("Error fetching product data from n8n:", error);
@@ -582,11 +589,8 @@
         let cart = [];
         let currentFilter = 'all';
 
-        // Category Labels
-        const categoryLabels = {};
-        products.forEach(item => {
-            categoryLabels[item.group] = item.group;
-        });
+
+
 
         // Render Products
         function renderProducts() {
