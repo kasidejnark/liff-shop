@@ -119,17 +119,17 @@
         <span>${profile.displayName}</span>
         `;
 
-                const params = new URLSearchParams(window.location.search);
-                const botnoiId = params.get("botnoi");
-                const product_code = params.get("product_code");
+                // const params = new URLSearchParams(window.location.search);
+                // const botnoiId = params.get("botnoi");
+                // const product_code = params.get("product_code");
 
-                console.log("LINE user:", profile.userId);
-                console.log("botnoi id:", botnoiId);
-                console.log("product code:", product_code);
+                // console.log("LINE user:", profile.userId);
+                // console.log("botnoi id:", botnoiId);
+                // console.log("product code:", product_code);
 
                 localStorage.setItem("lineUserId", profile.userId);
-                localStorage.setItem("botnoiUserId", botnoiId);
-                localStorage.setItem("productCode", product_code);
+                // localStorage.setItem("botnoiUserId", botnoiId);
+                // localStorage.setItem("productCode", product_code);
             } catch (err) {
                 console.error("LIFF init error:", err);
             }
