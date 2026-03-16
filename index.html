@@ -659,10 +659,10 @@
 
         // Add to Cart
         function addToCart(productId) {
-            const product = products.find(p => p.id === productId);
+            const product = products.find(p => p.ID === productId);
             const quantity = parseInt(document.getElementById(`qty-${productId}`).value) || 1;
 
-            const existingItem = cart.find(item => item.id === productId);
+            const existingItem = cart.find(item => item.ID === productId);
 
             if (existingItem) {
                 existingItem.quantity += quantity;
@@ -674,7 +674,7 @@
             }
 
             updateCartUI();
-            showToast(`เพิ่ม "${product.name}" x${quantity} ลงตะกร้าแล้ว`);
+            showToast(`เพิ่ม "${product.product_name}" x${quantity} ลงตะกร้าแล้ว`);
 
             // Reset quantity input
             document.getElementById(`qty-${productId}`).value = 1;
