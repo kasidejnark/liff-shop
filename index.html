@@ -602,11 +602,11 @@
                 : products.filter(p => p.category === currentFilter);
 
             grid.innerHTML = filteredProducts.map(product => `
-        <div class="product-card" data-category="${product.category}">
-          <img src="${product.image}" alt="${product.name}" class="product-image">
+        <div class="product-card" data-category="${product.group}">
+          <img src="${product.image}" alt="${product.product_name}" class="product-image">
           <div class="product-info">
-            <div class="product-category">${categoryLabels[product.category]}</div>
-            <h3 class="product-name">${product.name}</h3>
+            <div class="product-category">${categoryLabels[product.group]}</div>
+            <h3 class="product-name">${product.product_name}</h3>
             <div class="product-price">฿${product.price.toLocaleString()}</div>
             <div class="product-actions">
               <input type="number" class="quantity-input" id="qty-${product.id}" value="1" min="1" max="99">
