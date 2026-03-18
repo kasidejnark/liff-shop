@@ -159,7 +159,7 @@
             const productCode = localStorage.getItem("productCode");
             const botnoiUserId = localStorage.getItem("botnoiUserId");
 
-            const productname = document.getElementById('product-name').value;
+            const productname = document.getElementById('product-name').innerText;
             const qty = document.getElementById('qty').value;
 
             fetch(`https://n8n.scgjwd.com/webhook/add-cart?user_id=${botnoiUserId}`, {
