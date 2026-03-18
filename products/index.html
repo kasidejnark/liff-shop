@@ -607,12 +607,12 @@
         <div class="product-card" data-category="${product.category}">
           <img src="${product.image}" alt="${product.product_name}" class="product-image">
           <div class="product-info">
-            <div class="product-category">${categoryLabels[product.category]}</div>
+            <div class="product-category">${product.category}</div>
             <h3 class="product-name">${product.product_name}</h3>
             <div class="product-price">฿${product.price.toLocaleString()}</div>
             <div class="product-actions">
               <input type="number" class="quantity-input" id="qty-${product.product_code}" value="1" min="1" max="99">
-              <button class="add-to-cart" onclick="addToCart(${product.product_code})">
+              <button class="add-to-cart" onclick="addToCart('${product.product_code}')">
                 เพิ่มลงตะกร้า
               </button>
             </div>
@@ -651,16 +651,17 @@
 
         // Add to Cart
         function addToCart(productId) {
-            const product = products.find(p => p.product_code === productId);
+            const product = products.find(p => String(p.product_code) === String(productId));
             const quantity = parseInt(document.getElementById(`qty-${productId}`).value) || 1;
 
-            const existingItem = cart.find(item => item.product_code === productId);
+            const existingItem = cart.find(item => String(item.product_code) === String(productId));
 
             if (existingItem) {
                 existingItem.quantity += quantity;
             } else {
                 cart.push({
                     ...product,
+                    price: Number(product.price || 0),
                     quantity: quantity
                 });
             }
@@ -668,7 +669,6 @@
             updateCartUI();
             showToast(`เพิ่ม "${product.product_name}" x${quantity} ลงตะกร้าแล้ว`);
 
-            // Reset quantity input
             document.getElementById(`qty-${productId}`).value = 1;
         }
 
@@ -700,10 +700,10 @@
             } else {
                 cartItems.innerHTML = cart.map(item => `
           <div class="cart-item">
-            <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+            <img src="${item.image}" alt="${item.product_name}" class="cart-item-image">
             <div class="cart-item-details">
-              <div class="cart-item-name">${item.name}</div>
-              <div class="cart-item-price">฿${item.price}</div>
+              <div class="cart-item-name">${item.product_name}</div>
+              <div class="cart-item-price">฿${item.price.toLocaleString()}</div>
               <div class="cart-item-qty">จำนวน: ${item.quantity}</div>
             </div>
             <button class="remove-item" onclick="removeFromCart(${item.id})">🗑️</button>
@@ -742,6 +742,7 @@
             const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             alert(`ขอบคุณสำหรับการสั่งซื้อ!\n\nยอดรวม: ฿${total.toLocaleString()}\nจำนวนสินค้า: ${cart.length} รายการ`);
 
+            console.log("Order details:", cart);
             cart = [];
             updateCartUI();
             toggleCart();
