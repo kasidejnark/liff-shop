@@ -651,10 +651,10 @@
 
         // Add to Cart
         function addToCart(productId) {
-            const product = products.find(p => p.ID === productId);
+            const product = products.find(p => p.product_code === productId);
             const quantity = parseInt(document.getElementById(`qty-${productId}`).value) || 1;
 
-            const existingItem = cart.find(item => item.ID === productId);
+            const existingItem = cart.find(item => item.product_code === productId);
 
             if (existingItem) {
                 existingItem.quantity += quantity;
