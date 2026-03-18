@@ -460,13 +460,7 @@
         <!-- Filter Section -->
         <section class="filter-section">
             <h3 class="filter-title">🏷️ กรองตามประเภทสินค้า</h3>
-            <div class="filter-buttons">
-                <button class="filter-btn active" onclick="filterProducts(event,'all')">ทั้งหมด</button>
-                <button class="filter-btn" onclick="filterProducts(event,'electronics')">อิเล็กทรอนิกส์</button>
-                <button class="filter-btn" onclick="filterProducts(event,'clothing')">เสื้อผ้า</button>
-                <button class="filter-btn" onclick="filterProducts(event,'accessories')">เครื่องประดับ</button>
-                <button class="filter-btn" onclick="filterProducts(event,'home')">ของใช้ในบ้าน</button>
-            </div>
+            <div class="filter-buttons" id="filterButtons"></div>
         </section>
 
         <!-- Products Grid -->
@@ -627,6 +621,21 @@
       `).join('');
         }
 
+        function renderFilters() {
+            const container = document.getElementById('filterButtons');
+
+            let categories = [...new Set(products.map(p => p.category))];
+
+            container.innerHTML = `
+                <button class="filter-btn active" onclick="filterProducts(event,'all')">ทั้งหมด</button>
+                ${categories.map(cat => `
+                    <button class="filter-btn" onclick="filterProducts(event,'${cat}')">
+                        ${cat}
+                    </button>
+                `).join('')}
+            `;
+        }
+
         // Filter Products
         function filterProducts(event, category) {
             currentFilter = category;
@@ -742,6 +751,7 @@
         document.addEventListener("DOMContentLoaded", async () => {
             await initLiff();
             await product_data();
+            renderFilters();
             renderProducts();
             updateCartUI();
 
