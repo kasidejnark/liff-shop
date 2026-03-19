@@ -134,9 +134,11 @@
 
     <script>
         // ✅ ดึง parameter จาก URL
-        const params = new URLSearchParams(window.location.search);
-        const user_id = params.get("user_id");
-        const order_number = params.get("order_number");
+        const urlParams = new URLSearchParams(window.location.search);
+
+        let user_id = urlParams.get("user_id");
+        let order_number = urlParams.get("order_number");
+
 
         // แสดงผล
         document.getElementById("orderInfo").innerText =
