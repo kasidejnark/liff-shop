@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>สร้างรายการสำเร็จ</title>
+    <title>กำลังดำเนินการ</title>
+
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
     <style>
         * {
@@ -14,8 +16,8 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            font-family: 'Segoe UI';
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -25,93 +27,60 @@
 
         .container {
             text-align: center;
-            animation: fadeIn 0.6s ease;
         }
 
+        /* loader */
+        .loader {
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            border-top: 5px solid #e94560;
+            border-radius: 50%;
+            width: 90px;
+            height: 90px;
+            margin: auto;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* success */
         .success-circle {
             width: 120px;
             height: 120px;
             border-radius: 50%;
             border: 4px solid #e94560;
-            margin: 0 auto 20px;
+            margin: auto;
             position: relative;
-            animation: pop 0.5s ease;
+            display: none;
         }
 
         .checkmark {
             position: absolute;
+            font-size: 50px;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0);
-            font-size: 50px;
-            color: #e94560;
-            animation: check 0.5s ease forwards;
-            animation-delay: 0.4s;
-        }
-
-        h1 {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-        }
-
-        .order-info {
-            color: #ccc;
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-        }
-
-        .progress {
-            width: 200px;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            margin: 20px auto 0;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: #e94560;
-            width: 0%;
-            animation: load 2.5s linear forwards;
+            animation: pop 0.4s forwards;
         }
 
         @keyframes pop {
-            0% {
-                transform: scale(0.5);
-                opacity: 0;
-            }
-
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        @keyframes check {
             to {
                 transform: translate(-50%, -50%) scale(1);
             }
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
+        h1 {
+            margin-top: 20px;
+            font-size: 1.4rem;
         }
 
-        @keyframes load {
-            from {
-                width: 0%;
-            }
-
-            to {
-                width: 100%;
-            }
+        .order-info {
+            margin-top: 10px;
+            color: #ccc;
+            font-size: 0.9rem;
         }
     </style>
 </head>
@@ -119,58 +88,24 @@
 <body>
 
     <div class="container">
-        <div class="success-circle">
+        <div id="loader" class="loader"></div>
+
+        <div id="success" class="success-circle">
             <div class="checkmark">✔</div>
         </div>
 
-        <h1>สร้างรายการสำเร็จ</h1>
-
-        <div class="order-info" id="orderInfo"></div>
-
-        <div class="progress">
-            <div class="progress-bar"></div>
-        </div>
+        <h1 id="text">กำลังสร้างรายการ...</h1>
+        <div id="orderInfo" class="order-info"></div>
     </div>
 
     <script>
         const LIFF_ID = "2009103442-rALLRnvu";
 
-        async function initLiff() {
-            if (!window.liff) {
-                console.error("LIFF SDK not loaded");
-                return;
-            }
-            try {
-
-                await liff.init({
-                    liffId: LIFF_ID
-                });
-
-                if (!liff.isLoggedIn()) {
-                    liff.login();
-                    return;
-                }
-
-                const profile = await liff.getProfile();
-                const params = new URLSearchParams(window.location.search);
-                const product_code = params.get("product_code");
-                const botnoiId = params.get("botnoi");
-
-
-                localStorage.setItem("lineUserId", profile.userId);
-                localStorage.setItem("botnoiUserId", botnoiId);
-                localStorage.setItem("productCode", product_code);
-            } catch (err) {
-                console.error("LIFF init error:", err);
-            }
-        }
-
+        // 🔥 parse param (รองรับ liff.state)
         function getAllParams() {
             const urlParams = new URLSearchParams(window.location.search);
-
             let params = Object.fromEntries(urlParams.entries());
 
-            // ถ้ามี liff.state → decode
             if (params["liff.state"]) {
                 const decoded = decodeURIComponent(params["liff.state"]);
                 const inner = new URLSearchParams(decoded);
@@ -180,53 +115,57 @@
             return params;
         }
 
-        async function process_product() {
-            // ✅ ดึง parameter จาก URL
-            const param = getAllParams();
+        async function main() {
+            try {
+                await liff.init({ liffId: LIFF_ID });
 
-            let user_id = param["user_id"];
-            let order_number = param["order_number"];
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                    return;
+                }
 
-            // แสดงผล
-            document.getElementById("orderInfo").innerText =
-                `Order: ${order_number || '-'} | User: ${user_id || '-'}`;
+                const profile = await liff.getProfile();
+                const user_id = profile.userId;
 
-            // 🔥 (OPTIONAL) ยิง API ไป backend
-            // ใช้ถ้าคุณต้องการ confirm order / update status
-            if (user_id && order_number) {
-                fetch("https://your-api.com/confirm-order", {
+                const params = getAllParams();
+                const order_number = params.order_number;
+
+                document.getElementById("orderInfo").innerText =
+                    `Order: ${order_number || '-'}`;
+
+                // 🔥 ยิง API (รอจริง)
+                const res = await fetch("https://your-api.com/confirm-order", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        user_id: user_id,
-                        order_number: order_number
+                        user_id,
+                        order_number
                     })
-                })
-                    .then(res => res.json())
-                    .then(data => console.log("confirm success:", data))
-                    .catch(err => console.error("error:", err));
+                });
+
+                const data = await res.json();
+
+                // ✅ success animation
+                document.getElementById("loader").style.display = "none";
+                document.getElementById("success").style.display = "block";
+                document.getElementById("text").innerText = "สร้างรายการสำเร็จ";
+
+                // ✅ ปิด LIFF
+                setTimeout(() => {
+                    if (liff.isInClient()) {
+                        liff.closeWindow();
+                    }
+                }, 1500);
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById("text").innerText = "เกิดข้อผิดพลาด";
             }
-
-            // ปิดหน้าอัตโนมัติ
-            setTimeout(() => {
-                if (window.liff) {
-                    liff.closeWindow();
-                } else {
-                    window.close();
-                }
-            }, 2500);
-
-
         }
 
-        // Initialize
-        document.addEventListener("DOMContentLoaded", async () => {
-            await initLiff();
-            await process_product();
-
-        });
+        document.addEventListener("DOMContentLoaded", main);
     </script>
 
 </body>
