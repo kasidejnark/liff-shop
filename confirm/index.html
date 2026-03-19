@@ -165,10 +165,24 @@
             }
         }
 
+        function getAllParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+
+            let params = Object.fromEntries(urlParams.entries());
+
+            // ถ้ามี liff.state → decode
+            if (params["liff.state"]) {
+                const decoded = decodeURIComponent(params["liff.state"]);
+                const inner = new URLSearchParams(decoded);
+                params = Object.fromEntries(inner.entries());
+            }
+
+            return params;
+        }
 
         async function process_product() {
             // ✅ ดึง parameter จาก URL
-            const urlParams = new URLSearchParams(window.location.search);
+            const urlParams = getAllParams();
 
             let user_id = urlParams.get("user_id");
             let order_number = urlParams.get("order_number");
