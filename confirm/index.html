@@ -133,43 +133,87 @@
     </div>
 
     <script>
-        // ✅ ดึง parameter จาก URL
-        const urlParams = new URLSearchParams(window.location.search);
+        const LIFF_ID = "2009103442-rALLRnvu";
 
-        let user_id = urlParams.get("user_id");
-        let order_number = urlParams.get("order_number");
+        async function initLiff() {
+            if (!window.liff) {
+                console.error("LIFF SDK not loaded");
+                return;
+            }
+            try {
 
-        console.log(urlParams);
-        // แสดงผล
-        document.getElementById("orderInfo").innerText =
-            `Order: ${order_number || '-'} | User: ${user_id || '-'}`;
+                await liff.init({
+                    liffId: LIFF_ID
+                });
 
-        // 🔥 (OPTIONAL) ยิง API ไป backend
-        // ใช้ถ้าคุณต้องการ confirm order / update status
-        if (user_id && order_number) {
-            fetch("https://your-api.com/confirm-order", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    user_id: user_id,
-                    order_number: order_number
-                })
-            })
-                .then(res => res.json())
-                .then(data => console.log("confirm success:", data))
-                .catch(err => console.error("error:", err));
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                    return;
+                }
+
+                const profile = await liff.getProfile();
+                const params = new URLSearchParams(window.location.search);
+                const product_code = params.get("product_code");
+                const botnoiId = params.get("botnoi");
+
+
+                localStorage.setItem("lineUserId", profile.userId);
+                localStorage.setItem("botnoiUserId", botnoiId);
+                localStorage.setItem("productCode", product_code);
+            } catch (err) {
+                console.error("LIFF init error:", err);
+            }
         }
 
-        // ปิดหน้าอัตโนมัติ
-        setTimeout(() => {
-            if (window.liff) {
-                liff.closeWindow();
-            } else {
-                window.close();
+
+        async function process_product() {
+            // ✅ ดึง parameter จาก URL
+            const urlParams = new URLSearchParams(window.location.search);
+
+            let user_id = urlParams.get("user_id");
+            let order_number = urlParams.get("order_number");
+
+            console.log(urlParams);
+            // แสดงผล
+            document.getElementById("orderInfo").innerText =
+                `Order: ${order_number || '-'} | User: ${user_id || '-'}`;
+
+            // 🔥 (OPTIONAL) ยิง API ไป backend
+            // ใช้ถ้าคุณต้องการ confirm order / update status
+            if (user_id && order_number) {
+                fetch("https://your-api.com/confirm-order", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        user_id: user_id,
+                        order_number: order_number
+                    })
+                })
+                    .then(res => res.json())
+                    .then(data => console.log("confirm success:", data))
+                    .catch(err => console.error("error:", err));
             }
-        }, 2500);
+
+            // ปิดหน้าอัตโนมัติ
+            setTimeout(() => {
+                if (window.liff) {
+                    liff.closeWindow();
+                } else {
+                    window.close();
+                }
+            }, 2500);
+
+
+        }
+
+        // Initialize
+        document.addEventListener("DOMContentLoaded", async () => {
+            await initLiff();
+            await process_product();
+
+        });
     </script>
 
 </body>
