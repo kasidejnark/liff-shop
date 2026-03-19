@@ -182,12 +182,11 @@
 
         async function process_product() {
             // ✅ ดึง parameter จาก URL
-            const urlParams = getAllParams();
+            const param = getAllParams();
 
-            let user_id = urlParams.get("user_id");
-            let order_number = urlParams.get("order_number");
+            let user_id = param["user_id"];
+            let order_number = param["order_number"];
 
-            console.log(urlParams);
             // แสดงผล
             document.getElementById("orderInfo").innerText =
                 `Order: ${order_number || '-'} | User: ${user_id || '-'}`;
