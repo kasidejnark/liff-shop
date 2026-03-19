@@ -139,7 +139,7 @@
         let user_id = urlParams.get("user_id");
         let order_number = urlParams.get("order_number");
 
-
+        console.log(urlParams);
         // แสดงผล
         document.getElementById("orderInfo").innerText =
             `Order: ${order_number || '-'} | User: ${user_id || '-'}`;
