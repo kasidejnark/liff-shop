@@ -125,10 +125,11 @@
                 }
 
                 const profile = await liff.getProfile();
-                const user_id = profile.userId;
+
 
                 const params = getAllParams();
                 const order_number = params.order_number;
+                const user_id = params.user_id;
 
                 document.getElementById("orderInfo").innerText =
                     `Order: ${order_number || '-'}`;
