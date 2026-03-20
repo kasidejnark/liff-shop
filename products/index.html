@@ -810,8 +810,9 @@
             const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
             const payload = {
-                user_id: localStorage.getItem("lineUserId"),
-                botnoi_id: localStorage.getItem("botnoiUserId"),
+                lineUserName: localStorage.getItem("lineUserName"),
+                lineUserId: localStorage.getItem("lineUserId"),
+                botnoiUserId: localStorage.getItem("botnoiUserId"),
                 cus_name,
                 phone,
                 address,
@@ -820,7 +821,7 @@
             };
 
             try {
-                const res = await fetch("https://n8n.scgjwd.com/webhook-test/create-order", {
+                const res = await fetch("https://n8n.scgjwd.com/webhook-test/web-check", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
