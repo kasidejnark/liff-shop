@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #f5f6fa;
+        }
+
+        .container {
+            padding: 15px;
+            max-width: 500px;
+            margin: auto;
+        }
+
+        .item {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .item img {
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+            margin-right: 10px;
+        }
+
+        .info {
+            flex: 1;
+        }
+
+        .name {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .qty-control {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+        }
+
+        .qty-control button {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: #ddd;
+            border-radius: 6px;
+        }
+
+        .qty-control input {
+            width: 40px;
+            text-align: center;
+            margin: 0 5px;
+        }
+
+        .delete {
+            background: #ff4d4f;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .footer {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 10px;
+            box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-save {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #06c755;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="loading" class="loading">กำลังโหลด...</div>
+
+    <div class="container" id="cart"></div>
+
+    <div class="footer">
+        <button id="saveBtn" class="btn-save" disabled onclick="saveAll()">อัปเดตตะกร้า</button>
+    </div>
+
+    <script>
+        const LIFF_ID = "2009103442-jjBxlAv8";
+        let cartData = [];
+
+        async function initLiff() {
+            await liff.init({ liffId: LIFF_ID });
+
+            if (!liff.isLoggedIn()) {
+                liff.login();
+                return;
+            }
+
+            const params = new URLSearchParams(window.location.search);
+            localStorage.setItem("botnoiUserId", params.get("botnoi"));
+        }
+
+        async function loadCart() {
+            const userId = localStorage.getItem("botnoiUserId");
+
+            try {
+                const res = await fetch(`https://n8n.scgjwd.com/webhook/get-cart?user_id=${userId}`);
+                cartData = await res.json();
+
+                renderCart();
+
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("saveBtn").disabled = false;
+
+            } catch (err) {
+                console.error(err);
+                alert("โหลด cart ไม่สำเร็จ");
+            }
+        }
+
+        function renderCart() {
+            const container = document.getElementById("cart");
+            container.innerHTML = "";
+
+            cartData.forEach((item, index) => {
+                container.innerHTML += `
+            <div class="item">
+                <img src="${item.image}">
+                <div class="info">
+                    <div class="name">${item.product_name}</div>
+                    <div class="qty-control">
+                        <button onclick="changeQty(${index}, -1)">-</button>
+                        <input value="${item.quantity}" onchange="manualQty(${index}, this.value)">
+                        <button onclick="changeQty(${index}, 1)">+</button>
+                    </div>
+                </div>
+                <button class="delete" onclick="removeItem(${index})">ลบ</button>
+            </div>
+        `;
+            });
+        }
+
+        function changeQty(index, delta) {
+            cartData[index].quantity += delta;
+            if (cartData[index].quantity < 1) cartData[index].quantity = 1;
+            renderCart();
+        }
+
+        function manualQty(index, value) {
+            cartData[index].quantity = parseInt(value) || 1;
+        }
+
+        function removeItem(index) {
+            if (!confirm("ลบสินค้านี้?")) return;
+            cartData.splice(index, 1);
+            renderCart();
+        }
+
+        function saveAll() {
+            const userId = localStorage.getItem("botnoiUserId");
+
+            fetch(`https://n8n.scgjwd.com/webhook/update-cart-bulk?user_id=${userId}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(cartData)
+            })
+                .then(res => res.json())
+                .then(() => {
+                    alert("อัปเดตสำเร็จ");
+                });
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            await initLiff();
+            await loadCart();
+        });
+    </script>
+
+</body>
+
+</html>
