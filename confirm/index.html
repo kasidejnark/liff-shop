@@ -156,7 +156,14 @@
                 // ✅ ปิด LIFF
                 setTimeout(() => {
                     if (liff.isInClient()) {
-                        liff.closeWindow();
+                        liff.sendMessages([
+                            {
+                                type: 'text',
+                                text: 'ขอบคุณที่ใช้บริการ! รายการของคุณได้รับการยืนยันแล้ว 🎉'
+                            }
+                        ]).then(() => {
+                            liff.closeWindow();
+                        });
                     }
                 }, 1500);
 
