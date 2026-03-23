@@ -922,7 +922,7 @@
 
         // Change Quantity in Cart
         function save_qty(id, qty) {
-            fetch(`https://n8n.scgjwd.com/webhook-test/update-qty?product_id=${id}&qty=${qty}`, {
+            fetch(`https://n8n.scgjwd.com/webhook/update-qty?product_id=${id}&qty=${qty}`, {
                 method: "GET"
             })
                 .then(res => res.json())
