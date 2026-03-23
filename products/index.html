@@ -653,13 +653,14 @@
             try {
                 const res = await fetch(`https://n8n.scgjwd.com/webhook/get-cart?user_id=${userId}`);
                 cartData = await res.json();
-
+                addItemsToCartFromOrder(cartData);
             } catch (err) {
                 console.error(err);
                 alert("โหลด cart ไม่สำเร็จ");
             }
         }
         function addItemsToCartFromOrder(orderItems) {
+
             orderItems.forEach(item => {
                 const existingItem = cart.find(c => String(c.product_code) === String(item.product_id));
 
@@ -886,7 +887,7 @@
             await initLiff();
             await product_data();
             await loadCart();
-            addItemsToCartFromOrder();
+
             renderFilters();
             renderProducts();
             updateCartUI();
