@@ -919,7 +919,20 @@
             }
         }
 
+
         // Change Quantity in Cart
+        function save_qty(id, qty) {
+            fetch(`https://n8n.scgjwd.com/webhook-test/update-qty?product_id=${id}&qty=${qty}`, {
+                method: "GET"
+            })
+                .then(res => res.json())
+                .then(() => {
+                    alert("อัปเดตสำเร็จ");
+                    if (liff.isInClient()) {
+                        liff.closeWindow();
+                    }
+                });
+        }
         function changeQty(id, delta) {
             const item = cart.find(i => i.id === id);
             if (!item) return;
@@ -927,7 +940,7 @@
             item.quantity += delta;
 
             if (item.quantity < 1) item.quantity = 1;
-
+            save_qty(id, item.quantity);
             updateCartUI();
         }
         function handleQtyInput(id, value) {
@@ -942,7 +955,7 @@
             }
 
             item.quantity = qty;
-
+            save_qty(id, item.quantity);
             updateCartUI();
         }
 
@@ -1046,8 +1059,6 @@
                 behavior: 'smooth'
             });
         }
-
-
 
         function openDrawer() {
             document.getElementById('drawer').classList.add('open');
