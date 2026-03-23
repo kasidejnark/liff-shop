@@ -925,13 +925,7 @@
             fetch(`https://n8n.scgjwd.com/webhook/update-qty?product_id=${id}&qty=${qty}`, {
                 method: "GET"
             })
-                .then(res => res.json())
-                .then(() => {
-                    alert("อัปเดตสำเร็จ");
-                    if (liff.isInClient()) {
-                        liff.closeWindow();
-                    }
-                });
+
         }
         function changeQty(id, delta) {
             const item = cart.find(i => i.id === id);
