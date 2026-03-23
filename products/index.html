@@ -647,6 +647,41 @@
         let cart = [];
         let currentFilter = 'all';
 
+        async function loadCart() {
+            const userId = localStorage.getItem("botnoiUserId");
+
+            try {
+                const res = await fetch(`https://n8n.scgjwd.com/webhook/get-cart?user_id=${userId}`);
+                cartData = await res.json();
+
+            } catch (err) {
+                console.error(err);
+                alert("โหลด cart ไม่สำเร็จ");
+            }
+        }
+        function addItemsToCartFromOrder(orderItems) {
+            orderItems.forEach(item => {
+                const existingItem = cart.find(c => String(c.product_code) === String(item.product_id));
+
+                if (existingItem) {
+                    existingItem.quantity += Number(item.quantity);
+                } else {
+                    cart.push({
+                        id: item.id,
+                        product_code: item.product_id,
+                        product_name: item.product_name,
+                        price: Number(item.price || 0),
+                        quantity: Number(item.quantity || 1),
+                        image: item.image,
+                        unit: item.unit
+                    });
+                }
+            });
+
+            updateCartUI();
+        }
+
+
         // Render Products
         function renderProducts() {
             const grid = document.getElementById('productsGrid');
@@ -850,6 +885,8 @@
         document.addEventListener("DOMContentLoaded", async () => {
             await initLiff();
             await product_data();
+            await loadCart();
+            addItemsToCartFromOrder();
             renderFilters();
             renderProducts();
             updateCartUI();
