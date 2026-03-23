@@ -232,8 +232,9 @@
         }
 
         /* Cart Modal */
-        .cart-modal {
-            display: none;
+        /* Modal ใช้ร่วมกัน (cart-modal, drawer) */
+        .cart-modal,
+        .drawer {
             position: fixed;
             top: 0;
             right: 0;
@@ -243,22 +244,15 @@
             background: white;
             box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
             z-index: 200;
-            animation: slideIn 0.3s ease;
+            transition: right 0.3s ease;
+            right: -100%;
         }
 
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-            }
-
-            to {
-                transform: translateX(0);
-            }
-        }
-
-        .cart-modal.open {
+        .cart-modal.open,
+        .drawer.open {
             display: flex;
             flex-direction: column;
+            right: 0;
         }
 
         .cart-header {
@@ -371,7 +365,7 @@
             margin-bottom: 1rem;
         }
 
-        /* Overlay */
+        /* Overlay - ใช้ร่วมกันระหว่างตะกร้าและ drawer */
         .overlay {
             display: none;
             position: fixed;
@@ -418,7 +412,8 @@
                 grid-template-columns: 1fr;
             }
 
-            .cart-modal {
+            .cart-modal,
+            .drawer {
                 max-width: 100%;
             }
         }
@@ -458,23 +453,93 @@
             display: flex;
             justify-content: space-between;
         }
+
+        .order-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+        .confirm-btn {
+            margin-top: 10px;
+            width: 100%;
+            padding: 10px;
+            background: #06c755;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .confirm-btn:disabled {
+            background: gray;
+        }
+
+        #scrollTopBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #06c755;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            display: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ปุ่ม */
+        .open-btn {
+            top: 20px;
+            right: 20px;
+            background: #06c755;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            z-index: 9999;
+            gap: 0.5rem;
+            font-size: 1rem;
+            display: flex;
+            /* 🔥 สำคัญมาก */
+        }
+
+
+
+        /* item */
+        .item {
+            border-bottom: 1px solid #eee;
+            padding: 8px 0;
+        }
     </style>
 </head>
 
 <body>
     <!-- Header -->
     <header>
-        <!-- <div class="header-content">
-            <div class="logo">
-                🛍️ ร้านค้าออนไลน์
-            </div>
-            <button class="cart-btn" onclick="toggleCart()">
-                🛒 ตะกร้า
-                <span class="cart-count" id="cartCount">0</span>
-            </button>
-            <div id="userProfile" style="text-align:center;padding:10px;"></div>
-        </div> -->
-
         <div class="header-content">
             <div class="logo">
                 🛍️ ร้านค้าออนไลน์
@@ -487,9 +552,13 @@
                 </button>
 
                 <div id="userProfile"></div>
+
+                <!-- ปุ่มเปิด -->
+                <button class="open-btn" onclick="openDrawer()">📜 ดูรายการ</button>
             </div>
         </div>
     </header>
+
 
     <!-- Main Content -->
     <main>
@@ -503,10 +572,27 @@
         <div class="products-grid" id="productsGrid">
             <!-- Products will be rendered here by JavaScript -->
         </div>
+
+        <button id="scrollTopBtn" onclick="scrollToTop()">⬆️</button>
+
+        <!-- Drawer Overlay -->
+        <div class="overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+        <!-- Drawer -->
+
+        <div id="drawer" class="drawer">
+            <div class="cart-header">
+                <h2>รายการรอยืนยัน</h2>
+                <button class="close-cart" onclick="closeDrawer()">✕</button>
+            </div>
+
+            <div id="drawer-content"></div>
+        </div>
     </main>
 
+
     <!-- Cart Modal -->
-    <div class="overlay" id="overlay" onclick="toggleCart()"></div>
+    <div class="overlay" id="cartOverlay" onclick="toggleCart()"></div>
     <div class="cart-modal" id="cartModal">
         <div class="cart-header">
             <h2>🛒 ตะกร้าสินค้า</h2>
@@ -642,6 +728,27 @@
             }
         }
 
+
+        // History Cart Data (for edit order)
+        async function history_data(params) {
+            const userId = localStorage.getItem("botnoiUserId");
+            try {
+                const response = await fetch(`https://n8n.scgjwd.com/webhook/last-history?user_id=${userId}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                });
+
+                data = await response.json();
+                console.log("Get history data from n8n:", data);
+                renderDrawer(data);
+
+
+            } catch (error) {
+                console.error("Error fetching history data from n8n:", error);
+            }
+        }
 
         // Cart State
         let cart = [];
@@ -843,7 +950,7 @@
         // Toggle Cart
         function toggleCart() {
             const modal = document.getElementById('cartModal');
-            const overlay = document.getElementById('overlay');
+            const overlay = document.getElementById('cartOverlay');
 
             modal.classList.toggle('open');
             overlay.classList.toggle('open');
@@ -923,11 +1030,68 @@
             }
         }
 
+
+        window.onscroll = function () {
+            const btn = document.getElementById("scrollTopBtn");
+
+            if (document.documentElement.scrollTop > 200) {
+                btn.style.display = "block";
+            } else {
+                btn.style.display = "none";
+            }
+        };
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+
+
+        function openDrawer() {
+            document.getElementById('drawer').classList.add('open');
+            document.getElementById('drawerOverlay').classList.add('open');
+        }
+
+        function closeDrawer() {
+            document.getElementById('drawer').classList.remove('open');
+            document.getElementById('drawerOverlay').classList.remove('open');
+        }
+
+        function goToConfirm(userId, orderId) {
+            window.location.href = `/confirm/?user_id=${userId}&order_id=${orderId}`;
+        }
+
+        function renderDrawer(orders) {
+            const userId = localStorage.getItem("botnoiUserId");
+            // https://liff.line.me/2009103442-rALLRnvu?user_id=&order_number=SO00001
+            const el = document.getElementById('drawer-content');
+
+            el.innerHTML = orders.map(order => `
+                <div class="order-card">
+                <h4>${order.order_number}</h4>
+
+                ${order.items.map(item => `
+                    <div class="item">
+                    ${item.product_name} (${item.quantity})
+                    </div>
+                `).join('')}
+
+                <button onclick="goToConfirm(${userId},${order.order_number})">
+                    ✅ ยืนยัน
+                </button>
+                </div>
+            `).join('');
+        }
+
         // Initialize
         document.addEventListener("DOMContentLoaded", async () => {
             await initLiff();
             await product_data();
             await loadCart();
+            await history_data();
 
             renderFilters();
             renderProducts();
