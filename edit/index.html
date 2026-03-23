@@ -125,21 +125,13 @@
         let cartData = [];
 
         async function initLiff() {
-            // await liff.init({ liffId: LIFF_ID });
+            await liff.init({ liffId: LIFF_ID });
 
-            // if (!liff.isLoggedIn()) {
-            //     liff.login();
-            //     return;
-            // }
-            await liff.init({ liffId: LIFF_ID })
-                .then(() => {
-                    if (!liff.isLoggedIn()) {
-                        liff.login();
-                    } else {
-                        // 🔥 ตรงนี้แหละสำคัญ
-                        window.history.replaceState({}, document.title, window.location.pathname);
-                    }
-                });
+            if (!liff.isLoggedIn()) {
+                liff.login();
+                return;
+            }
+
 
             const params = new URLSearchParams(window.location.search);
             localStorage.setItem("botnoiUserId", params.get("botnoi"));

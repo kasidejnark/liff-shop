@@ -116,71 +116,70 @@
         }
 
         async function main() {
-            try {
-                // await liff.init({ liffId: LIFF_ID });
+            await liff.init({ liffId: LIFF_ID });
 
-                // if (!liff.isLoggedIn()) {
-                //     liff.login();
-                //     return;
-                // }
+            if (!liff.isLoggedIn()) {
+                liff.login();
+            } else {
 
-                await liff.init({ liffId: LIFF_ID })
-                    .then(() => {
-                        if (!liff.isLoggedIn()) {
-                            liff.login();
-                        } else {
-                            // 🔥 ตรงนี้แหละสำคัญ
-                            const url = new URL(window.location.href);
-
-                            url.searchParams.delete("code");
-                            url.searchParams.delete("state");
-                            url.searchParams.delete("liffClientId");
-                            url.searchParams.delete("liffRedirectUri");
-
-                            window.history.replaceState({}, document.title, url.pathname + url.search);
-                        }
-                    });
-
-
-
-                const profile = await liff.getProfile();
+                // ✅ 1. อ่าน params ก่อน
                 const params = getAllParams();
                 const order_number = params.order_number;
                 const user_id = params.user_id;
 
-                document.getElementById("orderInfo").innerText =
-                    `Order: ${order_number || '-'}`;
+                // 👉 กันพลาด (optional แต่แนะนำ)
+                if (order_number) {
+                    sessionStorage.setItem("order_number", order_number);
+                }
+                if (user_id) {
+                    sessionStorage.setItem("user_id", user_id);
+                }
 
-                // 🔥 ยิง API (รอจริง)
+                // ✅ 2. ค่อยลบ query
+                const url = new URL(window.location.href);
+                url.searchParams.delete("code");
+                url.searchParams.delete("state");
+                url.searchParams.delete("liffClientId");
+                url.searchParams.delete("liffRedirectUri");
+
+                window.history.replaceState({}, document.title, url.pathname + url.search);
+
+                // ✅ 3. ดึงค่าที่ใช้จริง
+                const finalOrderNumber = order_number || sessionStorage.getItem("order_number");
+                const finalUserId = user_id || sessionStorage.getItem("user_id");
+
+                // ✅ 4. get profile
+                const profile = await liff.getProfile();
+
+                document.getElementById("orderInfo").innerText =
+                    `Order: ${finalOrderNumber || '-'}`;
+
+                // 🔥 ยิง API
                 const res = await fetch("https://n8n.scgjwd.com/webhook/confirm-order", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        user_id,
-                        order_number
+                        user_id: finalUserId, // 👉 ใช้ค่าที่เซฟแล้ว
+                        order_number: finalOrderNumber
                     })
                 });
 
                 const data = await res.json();
 
-                // ✅ success animation
+                // ✅ success UI
                 document.getElementById("loader").style.display = "none";
                 document.getElementById("success").style.display = "block";
                 document.getElementById("text").innerText = "สร้างรายการสำเร็จ";
 
-                // ✅ ปิด LIFF
                 setTimeout(() => {
                     if (liff.isInClient()) {
                         liff.closeWindow();
                     }
                 }, 1500);
-
-            } catch (err) {
-                console.error(err);
-                document.getElementById("text").innerText = "เกิดข้อผิดพลาด";
             }
+
         }
 
         document.addEventListener("DOMContentLoaded", main);
