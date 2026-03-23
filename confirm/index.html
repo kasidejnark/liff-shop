@@ -130,18 +130,20 @@
                             liff.login();
                         } else {
                             // 🔥 ตรงนี้แหละสำคัญ
-                            window.history.replaceState({}, document.title, window.location.pathname);
+                            const url = new URL(window.location.href);
+
+                            url.searchParams.delete("code");
+                            url.searchParams.delete("state");
+                            url.searchParams.delete("liffClientId");
+                            url.searchParams.delete("liffRedirectUri");
+
+                            window.history.replaceState({}, document.title, url.pathname + url.search);
                         }
                     });
 
 
 
-
-
-
                 const profile = await liff.getProfile();
-
-
                 const params = getAllParams();
                 const order_number = params.order_number;
                 const user_id = params.user_id;
