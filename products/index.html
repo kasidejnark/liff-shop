@@ -786,17 +786,58 @@
         `;
             } else {
                 cartItems.innerHTML = cart.map(item => `
-          <div class="cart-item">
-            <img src="${item.image}" alt="${item.product_name}" class="cart-item-image">
-            <div class="cart-item-details">
-              <div class="cart-item-name">${item.product_name}</div>
-              <div class="cart-item-price">฿${item.price.toLocaleString()}</div>
-              <div class="cart-item-qty">จำนวน: ${item.quantity}</div>
-            </div>
-            <button class="remove-item" onclick="removeFromCart(${item.id})">🗑️</button>
-          </div>
-        `).join('');
+                <div class="cart-item">
+                    <img src="${item.image}" alt="${item.product_name}" class="cart-item-image">
+                    
+                    <div class="cart-item-details">
+                    <div class="cart-item-name">${item.product_name}</div>
+                    <div class="cart-item-price">฿${item.price.toLocaleString()}</div>
+
+                    <div class="cart-item-qty">
+                        <button onclick="changeQty(${item.id}, -1)">➖</button>
+
+                        <input 
+                        type="number"
+                        min="1"
+                        value="${item.quantity}"
+                        oninput="handleQtyInput(${item.id}, this.value)"
+                        >
+
+                        <button onclick="changeQty(${item.id}, 1)">➕</button>
+                    </div>
+                    </div>
+
+                    <button class="remove-item" onclick="removeFromCart(${item.id})">🗑️</button>
+                </div>
+                `).join('');
             }
+        }
+
+        // Change Quantity in Cart
+        function changeQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (!item) return;
+
+            item.quantity += delta;
+
+            if (item.quantity < 1) item.quantity = 1;
+
+            updateCartUI();
+        }
+        function handleQtyInput(id, value) {
+            const item = cart.find(i => i.id === id);
+            if (!item) return;
+
+            let qty = parseInt(value);
+
+            // กันค่าว่าง / NaN
+            if (isNaN(qty) || qty < 1) {
+                qty = 1;
+            }
+
+            item.quantity = qty;
+
+            updateCartUI();
         }
 
         // Toggle Cart
@@ -857,7 +898,7 @@
             };
 
             try {
-                const res = await fetch("https://n8n.scgjwd.com/webhook/web-check", {
+                const res = await fetch("https://n8n.scgjwd.com/webhook-test/web-check", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
