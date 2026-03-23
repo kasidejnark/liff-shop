@@ -16,15 +16,24 @@
 
         async function initLiff() {
             try {
-                await liff.init({ liffId: LIFF_ID });
+                // await liff.init({ liffId: LIFF_ID });
+                // if (!liff.isLoggedIn()) {
+                //     liff.login();
+                //     return;
+                // }
+                await liff.init({ liffId: LIFF_ID })
+                    .then(() => {
+                        if (!liff.isLoggedIn()) {
+                            liff.login();
+                        } else {
+                            // 🔥 ตรงนี้แหละสำคัญ
+                            window.history.replaceState({}, document.title, window.location.pathname);
+                        }
+                    });
 
-                if (!liff.isLoggedIn()) {
-                    liff.login();
-                    return;
-                }
+
 
                 const profile = await liff.getProfile();
-
                 // แสดงผล
                 document.getElementById("userProfile").innerHTML = `
           <img src="${profile.pictureUrl}" width="60" style="border-radius:50%">
