@@ -898,7 +898,7 @@
             };
 
             try {
-                const res = await fetch("https://n8n.scgjwd.com/webhook-test/web-check", {
+                const res = await fetch("https://n8n.scgjwd.com/webhook/web-check", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -927,7 +927,7 @@
         document.addEventListener("DOMContentLoaded", async () => {
             await initLiff();
             await product_data();
-            await loadCart();
+            // await loadCart();
 
             renderFilters();
             renderProducts();
