@@ -660,7 +660,8 @@
                 const botnoiId = localStorage.getItem("botnoi");
 
                 // ✅ ค่อยล้าง URL (ตอนนี้ไม่กลัวหายแล้ว)
-                window.history.replaceState({}, document.title, "/products/");
+                const cleanUrl = `/products/?botnoi=${botnoiId}`;
+                window.history.replaceState({}, document.title, cleanUrl);
 
                 const profile = await liff.getProfile();
 
