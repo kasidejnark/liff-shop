@@ -642,10 +642,12 @@
                 // ✅ เก็บ query ก่อนโดน redirect
                 const params = new URLSearchParams(window.location.search);
                 const botnoiFromUrl = params.get("botnoi");
-
+                const cartFromUrl = params.get("cart");
                 if (botnoiFromUrl) {
                     localStorage.setItem("botnoi", botnoiFromUrl);
+                    localStorage.setItem("cart", cartFromUrl);
                 }
+
 
                 await liff.init({ liffId: LIFF_ID });
 
@@ -658,6 +660,7 @@
 
                 // ✅ ใช้ค่าที่เก็บไว้แทน
                 const botnoiId = localStorage.getItem("botnoi");
+                const cartId = localStorage.getItem("cart");
 
                 // ✅ ค่อยล้าง URL (ตอนนี้ไม่กลัวหายแล้ว)
                 const cleanUrl = `/products/?botnoi=${botnoiId}`;
@@ -673,6 +676,7 @@
                 console.log("Display name:", profile.displayName);
                 console.log("LINE user:", profile.userId);
                 console.log("botnoi id:", botnoiId);
+                console.log("cart id:", cartId);
 
                 localStorage.setItem("botnoiUserId", botnoiId);
                 localStorage.setItem("lineUserId", profile.userId);
@@ -852,6 +856,27 @@
         }
 
         // Add to Cart
+        async function add_to_cart(payload) {
+            try {
+                const botnoiUserId = localStorage.getItem("botnoiUserId");
+                const res = await fetch(`https://n8n.scgjwd.com/webhook/add-cart?user_id=${botnoiUserId}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+
+                showToast("สั่งซื้อสำเร็จ 🎉");
+            }
+            catch (err) {
+                console.error(err);
+                showToast("เกิดข้อผิดพลาด");
+            }
+        }
+
         function addToCart(productId) {
             const product = products.find(p => String(p.product_code) === String(productId));
             const quantity = parseInt(document.getElementById(`qty-${productId}`).value) || 1;
@@ -868,6 +893,13 @@
                 });
             }
 
+            add_product = [{
+                "product_code": product.product_code,
+                "product_name": product.product_name,
+                "quantity": quantity
+            }];
+
+            add_to_cart(add_product);
             updateCartUI();
             showToast(`เพิ่ม "${product.product_name}" x${quantity} ลงตะกร้าแล้ว`);
 
