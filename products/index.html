@@ -910,8 +910,30 @@
         }
 
         // Remove from Cart
+        async function remove_from_cart(params) {
+            try {
+                const botnoiUserId = localStorage.getItem("botnoiUserId");
+                const res = await fetch(`https://n8n.scgjwd.com/webhook/remove-item?user_id=${botnoiUserId}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(params)
+                });
+
+                const data = await res.json();
+
+                showToast("สั่งซื้อสำเร็จ 🎉");
+            }
+            catch (err) {
+                console.error(err);
+                showToast("เกิดข้อผิดพลาด");
+            }
+        }
         function removeFromCart(productId) {
             cart = cart.filter(item => item.id !== productId);
+
+            remove_from_cart({ product_id: productId });
             updateCartUI();
         }
 
