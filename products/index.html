@@ -639,6 +639,14 @@
             }
 
             try {
+                // ✅ เก็บ query ก่อนโดน redirect
+                const params = new URLSearchParams(window.location.search);
+                const botnoiFromUrl = params.get("botnoi");
+
+                if (botnoiFromUrl) {
+                    localStorage.setItem("botnoi", botnoiFromUrl);
+                }
+
                 await liff.init({ liffId: LIFF_ID });
 
                 if (!liff.isLoggedIn()) {
@@ -648,17 +656,18 @@
                     return;
                 }
 
-                // ✅ เคลียร์ URL หลัง login
+                // ✅ ใช้ค่าที่เก็บไว้แทน
+                const botnoiId = localStorage.getItem("botnoi");
+
+                // ✅ ค่อยล้าง URL (ตอนนี้ไม่กลัวหายแล้ว)
                 window.history.replaceState({}, document.title, "/products/");
 
                 const profile = await liff.getProfile();
 
                 document.getElementById("userProfile").innerHTML = `
-            <img src="${profile.pictureUrl}" width="40" style="border-radius:50%">
-            <span>${profile.displayName}</span>
-        `;
-
-                const botnoiId = new URLSearchParams(window.location.search).get("botnoi");
+                    <img src="${profile.pictureUrl}" width="40" style="border-radius:50%">
+                    <span>${profile.displayName}</span>
+                `;
 
                 console.log("Display name:", profile.displayName);
                 console.log("LINE user:", profile.userId);
