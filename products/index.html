@@ -639,40 +639,39 @@
             }
 
             try {
-                await liff.init({
-                    liffId: LIFF_ID
-                });
+                await liff.init({ liffId: LIFF_ID });
+
                 if (!liff.isLoggedIn()) {
-                    liff.login();
+                    liff.login({
+                        redirectUri: window.location.origin + "/products/"
+                    });
                     return;
                 }
 
+                // ✅ เคลียร์ URL หลัง login
+                window.history.replaceState({}, document.title, "/products/");
 
                 const profile = await liff.getProfile();
 
                 document.getElementById("userProfile").innerHTML = `
-        <img src="${profile.pictureUrl}" width="40" style="border-radius:50%">
-        <span>${profile.displayName}</span>
+            <img src="${profile.pictureUrl}" width="40" style="border-radius:50%">
+            <span>${profile.displayName}</span>
         `;
 
-
                 const botnoiId = new URLSearchParams(window.location.search).get("botnoi");
+
                 console.log("Display name:", profile.displayName);
                 console.log("LINE user:", profile.userId);
                 console.log("botnoi id:", botnoiId);
 
-                // sendUserToN8N(profile, botnoiId);
                 localStorage.setItem("botnoiUserId", botnoiId);
                 localStorage.setItem("lineUserId", profile.userId);
                 localStorage.setItem("lineUserName", profile.displayName);
+
             } catch (err) {
-
                 console.error("LIFF init error:", err);
-
             }
-
         }
-
 
         async function sendUserToN8N(profile, botnoiId) {
 
