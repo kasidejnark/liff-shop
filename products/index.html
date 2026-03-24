@@ -659,14 +659,20 @@
                 }
 
                 // ✅ ใช้ค่าที่เก็บไว้แทน
-                const botnoiId = localStorage.getItem("botnoi");
+                let botnoiId = localStorage.getItem("botnoi");
                 const cartId = localStorage.getItem("cart");
+
+                const profile = await liff.getProfile();
+
+                // ✅ ถ้าไม่มี botnoi → ใช้ LINE userId แทน
+                if (!botnoiId || botnoiId === "null" || botnoiId === "undefined") {
+                    botnoiId = profile.userId;
+                    localStorage.setItem("botnoi", botnoiId);
+                }
 
                 // ✅ ค่อยล้าง URL (ตอนนี้ไม่กลัวหายแล้ว)
                 const cleanUrl = `/products/?botnoi=${botnoiId}`;
                 window.history.replaceState({}, document.title, cleanUrl);
-
-                const profile = await liff.getProfile();
 
                 document.getElementById("userProfile").innerHTML = `
                     <img src="${profile.pictureUrl}" width="40" style="border-radius:50%">
