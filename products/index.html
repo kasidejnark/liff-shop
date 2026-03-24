@@ -681,6 +681,9 @@
                 localStorage.setItem("botnoiUserId", botnoiId);
                 localStorage.setItem("lineUserId", profile.userId);
                 localStorage.setItem("lineUserName", profile.displayName);
+                if (cartId) {
+                    toggleCart();
+                }
 
             } catch (err) {
                 console.error("LIFF init error:", err);
