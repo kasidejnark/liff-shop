@@ -7,7 +7,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ร้านค้าออนไลน์</title>
 
+
+    <!-- 1. jQuery มาก่อน -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- 2. Select2 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+    <!-- 3. Select2 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+    <script>
+        // ตรวจสอบว่ารูปแบบต่างๆ โหลดสำเร็จ
+        console.log("jQuery loaded:", typeof jQuery !== 'undefined');
+        console.log("Select2 loaded:", typeof $.fn !== 'undefined' && typeof $.fn.select2 !== 'undefined');
+    </script>
+
 
 
     <style>
@@ -448,6 +465,13 @@
             border: none;
         }
 
+        .address-select {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+
         .modal-actions {
             margin-top: 15px;
             display: flex;
@@ -619,16 +643,194 @@
 
             <input type="text" id="cus_name" placeholder="ชื่อผู้รับ">
             <input type="text" id="phone" placeholder="เบอร์โทร">
-            <textarea id="address" placeholder="ที่อยู่จัดส่ง"></textarea>
+
+            <textarea id="address" placeholder="บ้านเลขที่ / ซอย / ถนน"></textarea>
+
+            <select id="province" class="address-select" style="width:100%;margin-bottom: 5px;"></select>
+            <select id="district" class="address-select" style="width:100%;margin-bottom: 5px;"></select>
+            <select id="subdistrict" class="address-select" style="width:100%;margin-bottom: 5px;"></select>
+
+            <input type="text" id="zipcode" placeholder="รหัสไปรษณีย์" readonly>
 
             <div class="modal-actions">
                 <button onclick="closeAddressModal()">ยกเลิก</button>
                 <button onclick="confirmCheckout()">ยืนยันสั่งซื้อ</button>
             </div>
+
+            <div id="address-form"></div>
         </div>
     </div>
 
     <script>
+
+        const API_KEY = "2ed53105e4336415049abc996135378b";
+        let provincesData = [];
+        let districtsData = [];
+        let subDistrictsData = [];
+
+        // โหลดข้อมูลที่อยู่จากไฟล์ JSON
+        function setSelect2State(selector, { enabled = true, placeholder = '', data = [] } = {}) {
+            const $el = $(selector);
+            $el.prop('disabled', !enabled);
+            $el.empty();
+
+            $el.select2({
+                data,
+                placeholder,
+                allowClear: true,
+                disabled: !enabled,
+                width: '100%'
+            });
+
+            if (!enabled) {
+                $el.val(null).trigger('change');
+            }
+        }
+
+        async function loadAddressData() {
+            try {
+                const [pRes, dRes, sRes] = await Promise.all([
+                    fetch('./provinces.json'),
+                    fetch('./districts.json'),
+                    fetch('./sub_districts.json')
+                ]);
+
+                provincesData = await pRes.json();
+                districtsData = await dRes.json();
+                subDistrictsData = await sRes.json();
+
+                console.log("Address data loaded successfully");
+                initProvinceDropdown();
+            } catch (error) {
+                console.error("Error loading address data:", error);
+            }
+        }
+
+        function initProvinceDropdown() {
+            const data = provincesData.map(p => ({ id: p.id, text: p.name_th }));
+
+            setSelect2State('#province', {
+                enabled: true,
+                placeholder: '-- เลือกจังหวัด --',
+                data
+            });
+
+            setSelect2State('#district', {
+                enabled: false,
+                placeholder: 'เลือกอำเภอ ก่อน'
+            });
+
+            setSelect2State('#subdistrict', {
+                enabled: false,
+                placeholder: '-- เลือกตำบล --'
+            });
+        }
+
+        function loadDistricts(provinceId) {
+            $('#zipcode').val('');
+
+            if (!provinceId) {
+                setSelect2State('#district', { enabled: false, placeholder: 'เลือกอำเภอ ก่อน' });
+                setSelect2State('#subdistrict', { enabled: false, placeholder: '-- เลือกตำบล --' });
+                return;
+            }
+
+            const filtered = districtsData.filter(d => d.province_id == provinceId);
+            const data = filtered.map(d => ({ id: d.id, text: d.name_th }));
+
+            setSelect2State('#district', {
+                enabled: true,
+                placeholder: '-- เลือกอำเภอ --',
+                data
+            });
+
+            setSelect2State('#subdistrict', { enabled: false, placeholder: '-- เลือกตำบล --' });
+        }
+
+        function loadSubDistricts(districtId) {
+            $('#zipcode').val('');
+
+            if (!districtId) {
+                setSelect2State('#subdistrict', {
+                    enabled: false,
+                    placeholder: '-- เลือกตำบล --'
+                });
+                return;
+            }
+
+            const filtered = subDistrictsData.filter(s => s.district_id == districtId);
+            const data = filtered.map(s => ({ id: s.id, text: s.name_th, zipcode: s.zip_code }));
+
+            setSelect2State('#subdistrict', {
+                enabled: true,
+                placeholder: '-- เลือกตำบล --',
+                data
+            });
+        }
+
+        // Event listeners
+        $('#province').on('change', function () {
+            const selectedProvince = this.value;
+            loadDistricts(selectedProvince);
+        });
+
+        $('#district').on('change', function () {
+            const selectedDistrict = this.value;
+            loadSubDistricts(selectedDistrict);
+        });
+
+        $('#subdistrict').on('change', function () {
+            const selected = $('#subdistrict').select2('data')[0];
+            $('#zipcode').val(selected ? selected.zipcode : '');
+        });
+
+        function validateWithLongdo() {
+            const addr = `
+                ${$('#subdistrict').val()}
+                ${$('#district').val()}
+                ${$('#province').val()}
+            `;
+
+            fetch(`https://api.longdo.com/map/services/search?keyword=${addr}&key=${API_KEY}`)
+                .then(res => res.json())
+                .then(data => {
+                    console.log("Longdo validate:", data);
+                });
+        }
+        // Longdo API
+        function useMyLocation() {
+            if (!navigator.geolocation) {
+                alert("เบราว์เซอร์ไม่รองรับ GPS");
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(success, error);
+        }
+
+        function success(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            fetch(`https://api.longdo.com/map/services/address?lon=${lon}&lat=${lat}&key=${API_KEY}`)
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data);
+
+                    document.getElementById("province").value = data.province || "";
+                    document.getElementById("district").value = data.district || "";
+                    document.getElementById("subdistrict").value = data.subdistrict || "";
+                    document.getElementById("zipcode").value = data.postcode || "";
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("ดึงที่อยู่ไม่สำเร็จ");
+                });
+        }
+
+        function error() {
+            alert("ไม่สามารถดึงตำแหน่งได้");
+        }
+
         const LIFF_ID = "2009103442-Wk6F029J";
 
         async function initLiff() {
@@ -1064,7 +1266,13 @@
             const phone = document.getElementById("phone").value;
             const address = document.getElementById("address").value;
 
-            if (!cus_name || !phone || !address) {
+            const province = document.getElementById("province").value;
+            const district = document.getElementById("district").value;
+            const subdistrict = document.getElementById("subdistrict").value;
+            const zipcode = document.getElementById("zipcode").value;
+
+
+            if (!cus_name || !phone || !address || !province || !district || !subdistrict || !zipcode) {
                 showToast("กรุณากรอกข้อมูลให้ครบ");
                 return;
             }
@@ -1077,7 +1285,7 @@
                 botnoiUserId: localStorage.getItem("botnoiUserId"),
                 cus_name,
                 phone,
-                address,
+                address: `${address} ต.${subdistrict}, อ.${district}, จ.${province}, ${zipcode}`,
                 total,
                 items: cart
             };
@@ -1136,10 +1344,6 @@
             document.getElementById('drawerOverlay').classList.remove('open');
         }
 
-        function goToConfirm(userId, orderId) {
-            window.location.href = `https://liff.line.me/2009103442-rALLRnvu?user_id=${userId}&order_id=${orderId}`;
-        }
-
         function renderDrawer(orders) {
             const userId = localStorage.getItem("botnoiUserId");
             // https://liff.line.me/2009103442-rALLRnvu?user_id=&order_number=SO00001
@@ -1165,6 +1369,7 @@
         // Initialize
         document.addEventListener("DOMContentLoaded", async () => {
             await initLiff();
+            await loadAddressData();
             await product_data();
             await loadCart();
             await history_data();
@@ -1172,7 +1377,29 @@
             renderFilters();
             renderProducts();
             updateCartUI();
+        });
 
+        $(document).ready(function () {
+            // ตรวจสอบว่า Select2 มี
+            if (typeof $.fn.select2 === 'undefined') {
+                console.error("Select2 ไม่โหลด");
+                return;
+            }
+
+            // Preload basic state in case loadAddressData ของยังไม่มา
+            setSelect2State('#province', {
+                enabled: true,
+                placeholder: '-- เลือกจังหวัด --',
+                data: []
+            });
+            setSelect2State('#district', {
+                enabled: false,
+                placeholder: 'เลือกอำเภอ ก่อน'
+            });
+            setSelect2State('#subdistrict', {
+                enabled: false,
+                placeholder: '-- เลือกตำบล --'
+            });
         });
     </script>
 </body>

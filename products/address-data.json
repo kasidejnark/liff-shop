@@ -1,0 +1,121 @@
+[
+    {
+        "province": "กรุงเทพมหานคร",
+        "districts": [
+            {
+                "district": "ดุสิต",
+                "subdistricts": [
+                    {
+                        "name": "ดุสิต",
+                        "zipcode": "10300"
+                    },
+                    {
+                        "name": "สามเสน",
+                        "zipcode": "10300"
+                    },
+                    {
+                        "name": "พญาไท",
+                        "zipcode": "10400"
+                    }
+                ]
+            },
+            {
+                "district": "ปทุมวัน",
+                "subdistricts": [
+                    {
+                        "name": "ปทุมวัน",
+                        "zipcode": "10330"
+                    },
+                    {
+                        "name": "มักกะสัน",
+                        "zipcode": "10330"
+                    },
+                    {
+                        "name": "ราชเทวี",
+                        "zipcode": "10330"
+                    }
+                ]
+            },
+            {
+                "district": "ราชเทวี",
+                "subdistricts": [
+                    {
+                        "name": "ราชเทวี",
+                        "zipcode": "10400"
+                    },
+                    {
+                        "name": "มรณิจนา",
+                        "zipcode": "10400"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "province": "นนทบุรี",
+        "districts": [
+            {
+                "district": "เมืองนนทบุรี",
+                "subdistricts": [
+                    {
+                        "name": "บางกรวย",
+                        "zipcode": "11000"
+                    },
+                    {
+                        "name": "บางศรุณ",
+                        "zipcode": "11000"
+                    }
+                ]
+            },
+            {
+                "district": "ปากเกร็ด",
+                "subdistricts": [
+                    {
+                        "name": "ปากเกร็ด",
+                        "zipcode": "11120"
+                    },
+                    {
+                        "name": "ไทรน้อย",
+                        "zipcode": "11120"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "province": "ปทุมธานี",
+        "districts": [
+            {
+                "district": "เมืองปทุมธานี",
+                "subdistricts": [
+                    {
+                        "name": "คลองหลวง",
+                        "zipcode": "12000"
+                    },
+                    {
+                        "name": "หนองจอก",
+                        "zipcode": "12000"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "province": "สมุทรปราการ",
+        "districts": [
+            {
+                "district": "เมืองสมุทรปราการ",
+                "subdistricts": [
+                    {
+                        "name": "บางพลี",
+                        "zipcode": "10540"
+                    },
+                    {
+                        "name": "ท่าจระเข้",
+                        "zipcode": "10540"
+                    }
+                ]
+            }
+        ]
+    }
+]
