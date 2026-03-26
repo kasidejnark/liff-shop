@@ -133,13 +133,8 @@
                 }
 
                 // ✅ ค่อยล้าง URL (ตอนนี้ไม่กลัวหายแล้ว)
-                const cleanUrl = `/products/?botnoi=${botnoiId}`;
+                const cleanUrl = `/product/?botnoi=${botnoiId}`;
                 window.history.replaceState({}, document.title, cleanUrl);
-
-                document.getElementById("userProfile").innerHTML = `
-                    <img src="${profile.pictureUrl}" width="40" style="border-radius:50%">
-                    <span>${profile.displayName}</span>
-                `;
 
 
                 localStorage.setItem("lineUserId", profile.userId);
