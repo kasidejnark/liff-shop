@@ -103,28 +103,44 @@
                 return;
             }
             try {
+                // ✅ เก็บ query ก่อนโดน redirect
+                const params = new URLSearchParams(window.location.search);
+                const product_codeFromUrl = params.get("product_code");
+                const botnoiFromUrl = params.get("botnoi");
+                if (botnoiFromUrl) {
+                    localStorage.setItem("botnoi", botnoiFromUrl);
+                    localStorage.setItem("product_code", product_codeFromUrl);
+                }
 
-                await liff.init({
-                    liffId: LIFF_ID
-                });
+                await liff.init({ liffId: LIFF_ID });
 
                 if (!liff.isLoggedIn()) {
-                    liff.login();
+                    liff.login({
+                        redirectUri: window.location.origin + "/product/"
+                    });
                     return;
                 }
 
+                // ✅ ใช้ค่าที่เก็บไว้แทน
+                let botnoiId = localStorage.getItem("botnoi");
+                let productCode = localStorage.getItem("product_code");
+
                 const profile = await liff.getProfile();
-                const params = new URLSearchParams(window.location.search);
-                const product_code = params.get("product_code");
-                const botnoiId = params.get("botnoi");
+                // ✅ ถ้าไม่มี botnoi → ใช้ LINE userId แทน
+                if (!botnoiId || botnoiId === "null" || botnoiId === "undefined") {
+                    botnoiId = profile.userId;
+                    localStorage.setItem("botnoi", botnoiId);
+                }
 
-                // const params = new URLSearchParams(window.location.search);
-                // const botnoiId = params.get("botnoi");
-                // const product_code = params.get("product_code");
+                // ✅ ค่อยล้าง URL (ตอนนี้ไม่กลัวหายแล้ว)
+                const cleanUrl = `/products/?botnoi=${botnoiId}`;
+                window.history.replaceState({}, document.title, cleanUrl);
 
-                // console.log("LINE user:", profile.userId);
-                // console.log("botnoi id:", botnoiId);
-                // console.log("product code:", product_code);
+                document.getElementById("userProfile").innerHTML = `
+                    <img src="${profile.pictureUrl}" width="40" style="border-radius:50%">
+                    <span>${profile.displayName}</span>
+                `;
+
 
                 localStorage.setItem("lineUserId", profile.userId);
                 localStorage.setItem("botnoiUserId", botnoiId);
