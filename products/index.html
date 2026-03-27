@@ -646,9 +646,15 @@
 
             <textarea id="address" placeholder="บ้านเลขที่ / ซอย / ถนน"></textarea>
 
-            <select id="province" class="address-select" style="width:100%;margin-bottom: 5px;"></select>
-            <select id="district" class="address-select" style="width:100%;margin-bottom: 5px;"></select>
-            <select id="subdistrict" class="address-select" style="width:100%;margin-bottom: 5px;"></select>
+            <select id="province" class="address-select" style="width:100%;margin-bottom: 5px;">
+                <option value=""></option>
+            </select>
+            <select id="district" class="address-select" style="width:100%;margin-bottom: 5px;">
+                <option value=""></option>
+            </select>
+            <select id="subdistrict" class="address-select" style="width:100%;margin-bottom: 5px;">
+                <option value=""></option>
+            </select>
 
             <input type="text" id="zipcode" placeholder="รหัสไปรษณีย์" readonly>
 
@@ -714,15 +720,17 @@
                 placeholder: '-- เลือกจังหวัด --',
                 data
             });
-
+            $('#province').val(null).trigger('change');
             setSelect2State('#district', {
                 enabled: false,
-                placeholder: 'เลือกอำเภอ ก่อน'
+                placeholder: 'เลือกอำเภอ ก่อน',
+                data: []
             });
 
             setSelect2State('#subdistrict', {
                 enabled: false,
-                placeholder: '-- เลือกตำบล --'
+                placeholder: '-- เลือกตำบล --',
+                data: []
             });
         }
 
@@ -730,8 +738,17 @@
             $('#zipcode').val('');
 
             if (!provinceId) {
-                setSelect2State('#district', { enabled: false, placeholder: 'เลือกอำเภอ ก่อน' });
-                setSelect2State('#subdistrict', { enabled: false, placeholder: '-- เลือกตำบล --' });
+                setSelect2State('#district', {
+                    enabled: false,
+                    placeholder: 'เลือกอำเภอ ก่อน',
+                    data: []
+                });
+
+                setSelect2State('#subdistrict', {
+                    enabled: false,
+                    placeholder: '-- เลือกตำบล --',
+                    data: []
+                });
                 return;
             }
 
@@ -744,7 +761,14 @@
                 data
             });
 
-            setSelect2State('#subdistrict', { enabled: false, placeholder: '-- เลือกตำบล --' });
+            // 🔥 reset ไม่ให้เลือกตัวแรก
+            $('#district').val(null).trigger('change');
+
+            setSelect2State('#subdistrict', {
+                enabled: false,
+                placeholder: '-- เลือกตำบล --',
+                data: []
+            });
         }
 
         function loadSubDistricts(districtId) {
@@ -753,19 +777,27 @@
             if (!districtId) {
                 setSelect2State('#subdistrict', {
                     enabled: false,
-                    placeholder: '-- เลือกตำบล --'
+                    placeholder: '-- เลือกตำบล --',
+                    data: []
                 });
                 return;
             }
 
             const filtered = subDistrictsData.filter(s => s.district_id == districtId);
-            const data = filtered.map(s => ({ id: s.id, text: s.name_th, zipcode: s.zip_code }));
+            const data = filtered.map(s => ({
+                id: s.id,
+                text: s.name_th,
+                zipcode: s.zip_code
+            }));
 
             setSelect2State('#subdistrict', {
                 enabled: true,
                 placeholder: '-- เลือกตำบล --',
                 data
             });
+
+            // 🔥 reset
+            $('#subdistrict').val(null).trigger('change');
         }
 
         // Event listeners
