@@ -134,7 +134,7 @@
                 }
 
                 // ✅ ค่อยล้าง URL (ตอนนี้ไม่กลัวหายแล้ว)
-                const cleanUrl = `/product/?botnoi=${botnoiId}`;
+                const cleanUrl = `/product/?botnoi=${botnoiId}&product_code=${productCode}`;
                 window.history.replaceState({}, document.title, cleanUrl);
 
 
